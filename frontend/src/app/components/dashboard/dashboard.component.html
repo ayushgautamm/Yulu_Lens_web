@@ -1,0 +1,236 @@
+<!-- ═══════════════════════════════════════════════════════════════
+     YULU-LENS DASHBOARD
+     ═══════════════════════════════════════════════════════════════ -->
+
+<div class="dashboard">
+
+  <!-- ── Installation Success Banner ──────────────────────── -->
+  <div class="banner banner--success animate-fade-in-up" *ngIf="justInstalled">
+    <div class="banner__icon">🎉</div>
+    <div class="banner__content">
+      <strong>Yulu-Lens installed successfully!</strong>
+      <p>Your GitHub App integration is now active. Repositories will appear below shortly.</p>
+    </div>
+    <button class="banner__close" (click)="dismissBanner()" aria-label="Dismiss banner">✕</button>
+  </div>
+
+  <!-- ── Hero Section ─────────────────────────────────────── -->
+  <header class="hero animate-fade-in-up">
+    <div class="hero__text">
+      <h1 class="hero__title">
+        Welcome to <span class="text-gradient">Yulu-Lens</span>
+      </h1>
+      <p class="hero__subtitle">
+        Automated code review powered by your GitHub App. Every pull request analysed, every change tracked.
+      </p>
+    </div>
+    <div class="hero__actions">
+      <a
+        id="install-app-btn"
+        [href]="installUrl"
+        target="_blank"
+        rel="noopener"
+        class="btn btn-primary btn-lg"
+      >
+        <span class="btn__icon">➕</span>
+        Install Yulu-Lens App
+      </a>
+      <button
+        id="login-github-btn"
+        class="btn btn-secondary btn-lg"
+        (click)="loginWithGithub()"
+        *ngIf="!isAuthenticated"
+      >
+        <span class="btn__icon">🔑</span>
+        Sign in with GitHub
+      </button>
+    </div>
+  </header>
+
+  <!-- ── Stats Cards ──────────────────────────────────────── -->
+  <section class="stats-grid animate-fade-in-up delay-1">
+    <div class="stat-card glass">
+      <div class="stat-card__icon stat-card__icon--repos">📦</div>
+      <div class="stat-card__body">
+        <span class="stat-card__value">{{ totalRepos }}</span>
+        <span class="stat-card__label">Repositories</span>
+      </div>
+    </div>
+    <div class="stat-card glass">
+      <div class="stat-card__icon stat-card__icon--active">⚡</div>
+      <div class="stat-card__body">
+        <span class="stat-card__value">{{ activeRepos }}</span>
+        <span class="stat-card__label">Active Monitors</span>
+      </div>
+    </div>
+    <div class="stat-card glass">
+      <div class="stat-card__icon stat-card__icon--prs">🔀</div>
+      <div class="stat-card__body">
+        <span class="stat-card__value">{{ totalOpenPRs }}</span>
+        <span class="stat-card__label">Open PRs</span>
+      </div>
+    </div>
+    <div class="stat-card glass">
+      <div class="stat-card__icon stat-card__icon--status">
+        <span *ngIf="loadingHealth" class="spinner"></span>
+        <span *ngIf="!loadingHealth && backendStatus === 'healthy'">🟢</span>
+        <span *ngIf="!loadingHealth && backendStatus !== 'healthy'">🔴</span>
+      </div>
+      <div class="stat-card__body">
+        <span class="stat-card__value" style="text-transform: capitalize;">{{ backendStatus }}</span>
+        <span class="stat-card__label">API Status <span *ngIf="backendVersion">v{{ backendVersion }}</span></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Repository Table Section ─────────────────────────── -->
+  <section class="repos-section animate-fade-in-up delay-2">
+    <div class="repos-header">
+      <h2 class="repos-header__title">Monitored Repositories</h2>
+      <div class="repos-header__search">
+        <span class="search-icon">🔍</span>
+        <input
+          id="search-repos-input"
+          type="text"
+          class="search-input"
+          placeholder="Search repos by name or language…"
+          [(ngModel)]="searchTerm"
+          (ngModelChange)="filterRepositories()"
+        >
+      </div>
+    </div>
+
+    <!-- Loading skeleton -->
+    <div class="table-skeleton" *ngIf="loadingRepos">
+      <div class="skeleton-row" *ngFor="let i of [1,2,3,4]">
+        <div class="skeleton-cell skeleton-cell--wide"></div>
+        <div class="skeleton-cell"></div>
+        <div class="skeleton-cell"></div>
+        <div class="skeleton-cell skeleton-cell--narrow"></div>
+      </div>
+    </div>
+
+    <!-- Empty state -->
+    <div class="empty-state glass" *ngIf="!loadingRepos && filteredRepositories.length === 0">
+      <div class="empty-state__icon">📭</div>
+      <h3 class="empty-state__title">No repositories found</h3>
+      <p class="empty-state__description" *ngIf="searchTerm">
+        No results for "{{ searchTerm }}". Try a different search term.
+      </p>
+      <p class="empty-state__description" *ngIf="!searchTerm">
+        Install the Yulu-Lens GitHub App on your repositories to start automated reviews.
+      </p>
+      <a
+        [href]="installUrl"
+        target="_blank"
+        rel="noopener"
+        class="btn btn-primary"
+        *ngIf="!searchTerm"
+      >
+        ➕ Install Yulu-Lens App
+      </a>
+    </div>
+
+    <!-- Repository data table -->
+    <div class="table-wrapper glass" *ngIf="!loadingRepos && filteredRepositories.length > 0">
+      <table class="data-table" id="repos-table">
+        <thead>
+          <tr>
+            <th>Repository</th>
+            <th>Language</th>
+            <th>Open PRs</th>
+            <th>Last Review</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let repo of filteredRepositories; let i = index" class="animate-fade-in-up" [style.animation-delay]="(i * 0.05) + 's'">
+            <td>
+              <div class="repo-name">
+                <span class="repo-name__icon">📁</span>
+                <div>
+                  <a
+                    class="repo-name__link"
+                    [href]="'https://github.com/' + repo.fullName"
+                    target="_blank"
+                    rel="noopener"
+                  >
+                    {{ repo.fullName }}
+                  </a>
+                </div>
+              </div>
+            </td>
+            <td>
+              <span class="lang-badge" [style.--lang-color]="getLanguageColor(repo.language)">
+                <span class="lang-badge__dot"></span>
+                {{ repo.language }}
+              </span>
+            </td>
+            <td>
+              <span class="pr-count" [class.pr-count--highlight]="repo.openPRs > 0">
+                {{ repo.openPRs }}
+              </span>
+            </td>
+            <td>
+              <span class="last-review">{{ formatRelativeTime(repo.lastReview) }}</span>
+            </td>
+            <td>
+              <span
+                class="badge"
+                [class.badge-success]="repo.status === 'active'"
+                [class.badge-warning]="repo.status === 'paused'"
+                [class.badge-danger]="repo.status === 'error'"
+              >
+                <span class="status-dot"
+                  [class.status-dot--active]="repo.status === 'active'"
+                  [class.status-dot--paused]="repo.status === 'paused'"
+                ></span>
+                {{ repo.status }}
+              </span>
+            </td>
+            <td>
+              <button
+                class="btn btn-ghost btn-sm"
+                (click)="syncRepository(repo.id)"
+                [disabled]="syncingRepoId === repo.id"
+                [attr.id]="'sync-btn-' + repo.id"
+              >
+                <span *ngIf="syncingRepoId !== repo.id">🔄 Sync</span>
+                <span *ngIf="syncingRepoId === repo.id" class="spinner spinner--sm"></span>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ── Integration Card ─────────────────────────────────── -->
+  <section class="integration-section animate-fade-in-up delay-3">
+    <div class="integration-card glass">
+      <div class="integration-card__header">
+        <div class="integration-card__icon">🔗</div>
+        <div>
+          <h3 class="integration-card__title">GitHub Integration</h3>
+          <p class="integration-card__subtitle">App ID: 4121674 · Client: Iv23li…Dppy · Owner: @harshthakur3</p>
+        </div>
+      </div>
+      <div class="integration-card__details">
+        <div class="integration-detail">
+          <span class="integration-detail__label">Webhook Events</span>
+          <span class="integration-detail__value">pull_request.opened</span>
+        </div>
+        <div class="integration-detail">
+          <span class="integration-detail__label">Auto-Review</span>
+          <span class="integration-detail__value badge badge-success">Enabled</span>
+        </div>
+        <div class="integration-detail">
+          <span class="integration-detail__label">File Diff Analysis</span>
+          <span class="integration-detail__value badge badge-success">Active</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>

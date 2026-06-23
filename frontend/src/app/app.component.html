@@ -1,0 +1,32 @@
+<!-- Root Shell — Yulu-Lens -->
+<div class="app-shell">
+  <!-- ── Top Navigation ─────────────────────────────────── -->
+  <nav class="topnav glass">
+    <div class="topnav__brand">
+      <span class="topnav__logo">🔍</span>
+      <span class="topnav__title text-gradient">Yulu-Lens</span>
+    </div>
+
+    <div class="topnav__links">
+      <a routerLink="/dashboard" routerLinkActive="topnav__link--active" class="topnav__link">
+        Dashboard
+      </a>
+    </div>
+
+    <div class="topnav__actions">
+      <a href="https://github.com/apps/yulu-lens" target="_blank" rel="noopener" class="btn btn-ghost btn-sm">
+        GitHub App
+      </a>
+    </div>
+  </nav>
+
+  <!-- ── Router Outlet ──────────────────────────────────── -->
+  <main class="app-content">
+    <router-outlet></router-outlet>
+  </main>
+
+  <!-- ── Footer ─────────────────────────────────────────── -->
+  <footer class="app-footer">
+    <span class="app-footer__text">© 2026 Yulu-Lens by <strong>@harshthakur3</strong> — Automated Code Review</span>
+  </footer>
+</div>

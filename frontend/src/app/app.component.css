@@ -1,0 +1,88 @@
+/* ── App Shell ───────────────────────────────────────────────── */
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* ── Top Navigation ─────────────────────────────────────────── */
+.topnav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-sm) var(--space-xl);
+  border-bottom: 1px solid var(--border-subtle);
+  border-radius: 0;
+}
+
+.topnav__brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.topnav__logo {
+  font-size: 1.5rem;
+}
+
+.topnav__title {
+  font-size: var(--fs-xl);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.topnav__links {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.topnav__link {
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  color: var(--text-secondary);
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-fast);
+}
+
+.topnav__link:hover {
+  color: var(--text-primary);
+  background: var(--bg-glass);
+}
+
+.topnav__link--active {
+  color: var(--text-primary);
+  background: var(--bg-glass);
+}
+
+.topnav__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+/* ── Main Content ───────────────────────────────────────────── */
+.app-content {
+  flex: 1;
+}
+
+/* ── Footer ─────────────────────────────────────────────────── */
+.app-footer {
+  padding: var(--space-lg) var(--space-xl);
+  text-align: center;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.app-footer__text {
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+}
+
+.app-footer__text strong {
+  color: var(--text-accent);
+  font-weight: 600;
+}
