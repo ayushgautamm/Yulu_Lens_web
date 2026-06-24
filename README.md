@@ -2,9 +2,7 @@
 
 > GitHub App–powered pull request analysis and automated review comments.
 
-**App Owner:** [@harshthakur3](https://github.com/harshthakur3)
-**GitHub App ID:** `4121674`
-**GitHub Client ID:** `Iv23li0EigVw5zkvDppy`
+
 
 ---
 
